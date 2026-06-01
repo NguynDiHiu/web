@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="fw-bold mb-4">🛒 Giỏ hàng của bạn</h2>
+<div class="row">
+    <div class="col-md-8 mb-4">
+        {% if items %}
+            <div class="card p-3 shadow-sm border-0">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th class="text-center">Giá</th>
+                                <th class="text-center" style="width: 150px;">Số lượng</th>
+                                <th class="text-end">Tổng tiền</th>
+                                <th class="text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                id: <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ item.product.image }}" style="width: 65px; height: 50px; object-fit: cover;" class="rounded me-3">
+                                        <div>
+                                            <h6 class="fw-bold mb-0">{{ item.product.name }}</h6>
+                                            <small class="text-muted">Kho: {{ item.product.stock }} máy có sẵn</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center fw-semibold">{{ "{:,}".format(item.product.price) }} đ</td>
+                                <td class="text-center">
+                                    <div class="input-group input-group-sm justify-content-center">
+                                        <a href="{{ url_for('update_cart', id=item.product.id, action='decrease') }}" class="btn btn-outline-secondary px-2 fw-bold">-</a>
+                                        <span class="input-group-text bg-white px-3 fw-bold">{{ item.quantity }}</span>
+                                        <a href="{{ url_for('update_cart', id=item.product.id, action='increase') }}" class="btn btn-outline-secondary px-2 fw-bold">+</a>
+                                    </div>
+                                </td>
+                                <td class="text-end text-danger fw-bold">{{ "{:,}".format(item.total) }} đ</td>
+                                <td class="text-center">
+                                    <a href="{{ url_for('remove_from_cart', id=item.product.id) }}" class="btn btn-sm btn-link text-danger p-0 fw-semibold text-decoration-none">Xóa bỏ</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center py-5 rounded-3 shadow-sm">
+                <h4 class="mb-3">Giỏ hàng trống trơn!</h4>
+                <a href="{{ url_for('index') }}" class="btn btn-primary px-4">Quay lại mua sắm máy tính</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if items %}
+    <div class="col-md-4">
+        <div class="card p-4 shadow-sm bg-white">
+            <h4 class="fw-bold mb-4 text-dark">Thanh toán đơn hàng</h4>
+            <div class="d-flex justify-content-between mb-4 fs-4">
+                <span>Tổng tiền:</span>
+                <span class="text-danger fw-bold">{{ "{:,}".format(total_price) }} đ</span>
+            </div>
+            <a href="{{ url_for('checkout') }}" class="btn btn-success btn-lg w-100 fw-bold shadow-sm">💳 XÁC NHẬN ĐẶT HÀNG</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

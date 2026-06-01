@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-4 shadow-sm">
+    <div class="row g-4 align-items-center">
+        <div class="col-md-5">
+            <img src="{{ product.image }}" class="img-fluid rounded shadow" alt="{{ product.name }}">
+        </div>
+        <div class="col-md-7">
+            <span class="badge bg-primary px-3 py-2 mb-2">{{ product.category }}</span>
+            <h1 class="fw-bold text-dark">{{ product.name }}</h1>
+            <h2 class="text-danger fw-bold my-3">{{ "{:,}".format(product.price) }} đ</h2>
+            <hr>
+            <h5 class="fw-bold text-secondary">Mô tả chi tiết sản phẩm:</h5>
+            <p class="fs-5 text-muted" style="white-space: pre-line;">{{ product.description }}</p>
+            <hr>
+            <div class="d-flex gap-3 mt-4">
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg px-4">Quay lại</a>
+                <a href="{{ url_for('add_to_cart', id=product.id) }}" class="btn btn-primary btn-lg px-5">Thêm vào giỏ hàng</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

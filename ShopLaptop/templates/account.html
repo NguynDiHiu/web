@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-5 mb-4">
+        <div class="card p-4 shadow-sm">
+            <h3 class="fw-bold mb-4 text-primary">⚙ Thông tin cá nhân</h3>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Họ và tên</label>
+                    <input type="text" name="fullname" class="form-control" value="{{ user.fullname }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Số điện thoại</label>
+                    <input type="text" name="phone" class="form-control" value="{{ user.phone }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Email (Không thể sửa đổi)</label>
+                    <input type="email" class="form-control bg-light" value="{{ user.email }}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Địa chỉ giao hàng</label>
+                    <textarea name="address" class="form-control" rows="3" required>{{ user.address }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Cập nhật thông tin</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="card p-4 shadow-sm">
+            <h3 class="fw-bold mb-4 text-success">📜 Lịch sử mua hàng</h3>
+            {% if user.orders %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Mã ĐH</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Giá tiền</th>
+                                <th>Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in user.orders %}
+                            <tr>
+                                <td>#{{ order.id }}</td>
+                                <td class="fw-bold text-primary">{{ order.product_name }}</td>
+                                <td class="text-danger fw-bold">{{ "{:,}".format(order.price) }} đ</td>
+                                <td class="small text-muted">{{ order.date_ordered }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">Bạn chưa thực hiện đơn hàng nào.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

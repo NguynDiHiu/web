@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card p-4 shadow-sm mt-5">
+            <h3 class="fw-bold text-center mb-4 text-dark">🔑 ĐĂNG NHẬP TÀI KHOẢN</h3>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Địa chỉ Email</label>
+                    <input type="email" name="email" class="form-control" placeholder="example@gmail.com" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Mật khẩu</label>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold my-2">Đăng Nhập</button>
+            </form>
+            <div class="text-center mt-3">
+                <span>Chưa có tài khoản? <a href="{{ url_for('register') }}">Đăng ký ngay</a></span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

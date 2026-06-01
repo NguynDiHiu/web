@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="fw-bold mb-4 text-center">⚙ HỆ THỐNG QUẢN TRỊ VIÊN</h1>
+<hr>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card p-3 shadow-sm bg-light border-0 mb-3">
+            <h5 class="fw-bold text-success mb-3">📂 Thêm Danh Mục Mới</h5>
+            <form method="POST">
+                <input type="hidden" name="add_category" value="1">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Tên danh mục</label>
+                    <input type="text" name="cat_name" class="form-control form-control-sm" placeholder="Ví dụ: UltraBook, Sinh viên..." required>
+                </div>
+                <button type="submit" class="btn btn-success w-100 btn-sm fw-bold">Tạo Danh Mục</button>
+            </form>
+        </div>
+
+        <div class="card p-3 shadow-sm border-0">
+            <h5 class="fw-bold text-dark mb-3">List Danh Mục Hiện Có</h5>
+            <ul class="list-group list-group-flush small">
+                {% for cat in categories %}
+                <div class="list-group-item d-flex justify-content-between align-items-center px-1 py-2">
+                    <span>📁 <strong>{{ cat.name }}</strong></span>
+                    <a href="{{ url_for('delete_category', id=cat.id) }}" class="text-danger text-decoration-none fw-bold" onclick="return confirm('Bạn chắc chắn muốn xóa danh mục này?')">Xóa</a>
+                </div>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card p-3 shadow-sm bg-light border-0">
+            <h5 class="fw-bold text-primary mb-3">➕ Thêm Laptop Mới</h5>
+            <form method="POST">
+                <input type="hidden" name="add_product" value="1">
+                <div class="mb-2"><label class="form-label small fw-bold">Tên Laptop</label><input type="text" name="name" class="form-control form-control-sm" required></div>
+                
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Chọn danh mục</label>
+                    <select name="category" class="form-select form-select-sm" required>
+                        <option value="" disabled selected>-- Chọn danh mục --</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.name }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-2 row">
+                    <div class="col"><label class="form-label small fw-bold">Giá (đ)</label><input type="number" name="price" class="form-control form-control-sm" required></div>
+                    <div class="col"><label class="form-label small fw-bold">Số lượng kho</label><input type="number" name="stock" class="form-control form-control-sm" value="10" min="0" required></div>
+                </div>
+                <div class="mb-2"><label class="form-label small fw-bold">Đường dẫn URL ảnh</label><input type="text" name="image" class="form-control form-control-sm" value="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500" required></div>
+                <div class="mb-3"><label class="form-label small fw-bold">Mô tả chi tiết</label><textarea name="description" class="form-control form-control-sm" rows="3" required></textarea></div>
+                <button type="submit" class="btn btn-primary w-100 btn-sm fw-bold">Thêm vào kho hàng</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card p-3 shadow-sm border-0">
+            <h5 class="fw-bold text-dark mb-3">📦 Danh Sách Kho Hàng</h5>
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-bordered align-middle text-center small m-0" style="font-size: 11px;">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Tên máy</th>
+                            <th>Danh mục</th>
+                            <th>Kho</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in products %}
+                        <tr>
+                            <form action="{{ url_for('edit_product', id=p.id) }}" method="POST">
+                                <td><input type="text" name="name" class="form-control form-control-sm fw-bold p-1" style="font-size:11px;" value="{{ p.name }}"></td>
+                                <td>
+                                    <select name="category" class="form-select form-select-sm p-1" style="font-size:11px;">
+                                        {% for cat in categories %}
+                                            <option value="{{ cat.name }}" {% if p.category == cat.name %}selected{% endif %}>{{ cat.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td><input type="number" name="stock" class="form-control form-control-sm text-center p-1" style="font-size:11px;" value="{{ p.stock }}" min="0"></td>
+                                <input type="hidden" name="price" value="{{ p.price }}">
+                                <input type="hidden" name="image" value="{{ p.image }}">
+                                <input type="hidden" name="description" value="{{ p.description }}">
+                                <td>
+                                    <div class="d-flex gap-1 justify-content-center">
+                                        <button type="submit" class="btn btn-warning btn-sm p-1" style="font-size:10px;">Lưu</button>
+                                        <a href="{{ url_for('delete_product', id=p.id) }}" class="btn btn-danger btn-sm p-1" style="font-size:10px;">Xóa</a>
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4 shadow-sm border-0 mt-3">
+    <h4 class="fw-bold text-success mb-3">📜 Nhật ký lịch sử đơn hàng khách mua</h4>
+    <div class="table-responsive">
+        <table class="table table-striped align-middle small">
+            <thead class="table-secondary text-center">
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Số điện thoại</th>
+                    <th>Địa chỉ nhận hàng</th>
+                    <th>Tên Laptop</th>
+                    <th>SL mua</th>
+                    <th>Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                {% for o in orders %}
+                <tr>
+                    <td>#{{ o.id }}</td>
+                    <td class="fw-bold text-primary">{{ o.user.fullname }}</td>
+                    <td>{{ o.user.phone }}</td>
+                    <td class="text-start">{{ o.user.address }}</td>
+                    <td class="fw-bold text-start">{{ o.product_name }}</td>
+                    <td class="fw-bold">{{ o.quantity }}</td>
+                    <td class="text-danger fw-bold">{{ "{:,}".format(o.price) }} đ</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="text-center text-muted py-4">Hệ thống chưa ghi nhận đơn đặt hàng nào gần đây.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
