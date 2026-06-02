@@ -2,15 +2,10 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from extensions import db, mail
-
 app = Flask(__name__)
-application = app
-
 app.secret_key = 'laptop_secret_key_123'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 # EMAIL CONFIG (Flask-Mail)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -18,13 +13,11 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'levietphuc2005@gmail.com'
 app.config['MAIL_PASSWORD'] = 'qgpb knqn jffs gfqb'
 app.config['MAIL_DEFAULT_SENDER'] = 'levietphuc2005@gmail.com'
+from extensions import db, mail
 
-# Khởi tạo extensions
 db.init_app(app)
 mail.init_app(app)
-
 from models import User, Category, Product, Order
-
 def init_db():
     if not os.path.exists('instance/database.db'):
         with app.app_context():
@@ -47,15 +40,12 @@ def init_db():
                 db.session.add_all([p1, p2])
             db.session.commit()
 
-# ĐẢM BẢO DATABASE LUÔN ĐƯỢC KHỞI TẠO TRÊN RENDER / GUNICORN
-init_db()
-
 #  ROUTES 
 @app.route('/')
 def index():
     cat = request.args.get('category')
     products = Product.query.filter_by(category=cat).all() if cat else Product.query.all()
-    categories = Category.query.all() 
+    categories = Category.query.all() # Lấy danh mục từ database
     return render_template('index.html', products=products, categories=categories, current_cat=cat)
 
 @app.route('/product/<int:id>')
@@ -199,31 +189,40 @@ def checkout():
         return redirect(url_for('login'))
 
     cart = get_clean_cart()
+
     if not cart:
         return redirect(url_for('index'))
 
     for pid_str, qty in cart.items():
+
         p = Product.query.get(int(pid_str))
+
         if p and p.stock >= qty:
+
             p.stock -= qty
+
             new_order = Order(
                 user_id=session['user_id'],
                 product_name=p.name,
                 quantity=qty,
                 price=p.price * qty
             )
+
             db.session.add(new_order)
 
     db.session.commit()
-    session['cart'] = {}
-    flash('Đặt hàng thành công!', 'success')
-    return redirect(url_for('account'))
 
-#  TRANG ADMIN 
+    session['cart'] = {}
+
+    flash('Đặt hàng thành công!', 'success')
+
+    return redirect(url_for('account'))
+#  TRANG ADMIN (BỔ SUNG THÊM DANH MỤC) 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     if not session.get('is_admin'): return redirect(url_for('index'))
     if request.method == 'POST':
+        # Kiểm tra xem đang gửi form thêm Sản phẩm hay form thêm Danh mục
         if 'add_product' in request.form:
             name = request.form['name']
             category = request.form['category']
@@ -269,6 +268,7 @@ def edit_product(id):
 def delete_category(id):
     if not session.get('is_admin'): return redirect(url_for('index'))
     c = Category.query.get_or_404(id)
+    # Kiểm tra xem có sản phẩm nào thuộc danh mục này không
     if Product.query.filter_by(category=c.name).first():
         flash('Không thể xóa danh mục này vì đang có sản phẩm thuộc danh mục!', 'danger')
     else:
@@ -284,10 +284,8 @@ def delete_product(id):
     db.session.delete(p)
     db.session.commit()
     return redirect(url_for('admin'))
-
-# Đặt import Blueprint và Register ở cuối cùng để tránh hoàn toàn lỗi Circular Import
 from chatbot import chatbot_bp
 app.register_blueprint(chatbot_bp)
-
 if __name__ == '__main__':
+    init_db()
     app.run(debug=True, use_reloader=False)
