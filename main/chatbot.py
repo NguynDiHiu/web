@@ -4,7 +4,7 @@ from groq import Groq
 from email_service import send_order_email
 chatbot_bp = Blueprint('chatbot', __name__)
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", os.getenv("GROQ_API_KEY"))
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "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")
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 
